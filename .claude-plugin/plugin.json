@@ -1,0 +1,10 @@
+{
+  "name": "claude-autoresearch",
+  "version": "0.1.0",
+  "description": "Autonomous goal-driven experimentation framework for Claude Code. Modify, verify, keep/discard, repeat.",
+  "author": {
+    "name": "yin52133"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/yin52133/claude-autoresearch"
+}
