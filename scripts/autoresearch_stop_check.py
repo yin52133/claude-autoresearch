@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Stop hook: prevent premature exit if autoresearch loop is active."""
+"""Stop hook: warn if autoresearch loop is active and goal not reached."""
 
 import json
 import os
 import sys
 from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent
-PLUGIN_ROOT = SCRIPT_DIR.parent
-STATE_PATH = PLUGIN_ROOT.parent / "autoresearch-results" / "state.json"
+ARTIFACT_DIR = Path(os.environ.get("PWD", ".")) / "autoresearch-results"
+STATE_PATH = ARTIFACT_DIR / "state.json"
 
 
 def main():
@@ -33,10 +32,9 @@ def main():
     sys.stderr.write(
         f"\n[autoresearch] Active run detected (iteration {iterations}).\n"
         f"[autoresearch] Current metric: {metric}={current} (baseline: {baseline}).\n"
-        f"[autoresearch] To stop safely: run 'python3 {SCRIPT_DIR}/autoresearch_state.py complete'\n"
-        f"[autoresearch] To pause: run 'python3 {SCRIPT_DIR}/autoresearch_state.py pause'\n"
+        f"[autoresearch] To stop safely: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_state.py complete\n"
+        f"[autoresearch] To pause: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_state.py pause\n"
     )
-    # Return non-zero to block the stop, but let Claude decide
     sys.exit(0)
 
 

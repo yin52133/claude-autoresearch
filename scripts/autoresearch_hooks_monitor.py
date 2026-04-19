@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""PostToolUse hook: monitor iteration progress and detect stalls."""
+"""PostToolUse hook: monitor iteration progress."""
 
 import json
 import os
 import sys
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 
-SCRIPT_DIR = Path(__file__).parent
-PLUGIN_ROOT = SCRIPT_DIR.parent
-STATE_PATH = PLUGIN_ROOT.parent / "autoresearch-results" / "state.json"
-CONTEXT_PATH = PLUGIN_ROOT.parent / "autoresearch-results" / "context.json"
+ARTIFACT_DIR = Path(os.environ.get("PWD", ".")) / "autoresearch-results"
+STATE_PATH = ARTIFACT_DIR / "state.json"
+CONTEXT_PATH = ARTIFACT_DIR / "context.json"
 
 
 def main():
-    # Read state
     if not STATE_PATH.exists():
         sys.exit(0)
 
@@ -27,7 +25,6 @@ def main():
     if state.get("status") != "running":
         sys.exit(0)
 
-    # Update last activity time in context
     try:
         with open(CONTEXT_PATH) as f:
             context = json.load(f)
@@ -37,7 +34,6 @@ def main():
     context["last_activity"] = datetime.now().isoformat()
     context["iteration_count"] = state.get("iteration_count", 0)
 
-    # Write back
     tmp = CONTEXT_PATH.with_suffix(".tmp")
     with open(tmp, "w") as f:
         json.dump(context, f, indent=2)

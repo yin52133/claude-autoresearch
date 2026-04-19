@@ -6,10 +6,8 @@ import os
 import sys
 from pathlib import Path
 
-# Navigate from scripts/ to project root
-SCRIPT_DIR = Path(__file__).parent
-PLUGIN_ROOT = SCRIPT_DIR.parent
-STATE_PATH = PLUGIN_ROOT.parent / "autoresearch-results" / "state.json"
+ARTIFACT_DIR = Path(os.environ.get("PWD", ".")) / "autoresearch-results"
+STATE_PATH = ARTIFACT_DIR / "state.json"
 
 
 def main():
@@ -55,7 +53,6 @@ def main():
         "",
     ]
 
-    # Write to stdout so Claude Code can pick it up
     print("\n".join(lines))
     sys.exit(0)
 
