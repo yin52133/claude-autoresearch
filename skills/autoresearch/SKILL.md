@@ -18,7 +18,10 @@ An autonomous goal-driven experimentation framework. Tell it what to improve, th
    - `references/interaction-wizard.md` for every new interactive launch before execution begins
    - `references/results-logging.md` only when debugging TSV/state semantics
 4. Load the selected mode workflow reference plus cross-cutting protocols as needed (`lessons`, `pivot`, `health-check`, `web-search`, `hypothesis-perspectives`).
-5. Use bundled helper scripts via `${CLAUDE_PLUGIN_ROOT}/scripts/` for stateful artifacts and runtime control.
+5. Use bundled helper scripts for stateful artifacts and runtime control. Resolve the scripts path once at the start of each run:
+   - If `$CLAUDE_PLUGIN_ROOT` is set: `SCRIPTS="${CLAUDE_PLUGIN_ROOT}/scripts"`
+   - Otherwise, find the cached plugin: `SCRIPTS=$(ls -d ~/.claude/plugins/cache/local/claude-autoresearch/*/scripts 2>/dev/null | tail -1)`
+   - Always set `PYTHONPATH=$SCRIPTS` when calling helper scripts so cross-imports work.
 6. Execute the selected workflow exactly as written and produce required structured output and artifacts.
 
 ## Core Loop
@@ -127,7 +130,7 @@ Foreground persistent artifacts: `results.tsv`, `state.json`, `context.json`, `l
 **16. When stuck (3+ consecutive discards), use the PIVOT/REFINE escalation ladder from `references/pivot-protocol.md`.**
 
 **17. Prefer the bundled helper scripts over hand-editing artifacts.**
-Always call them via `${CLAUDE_PLUGIN_ROOT}/scripts/`.
+Always call them via `${SCRIPTS}` (resolved at run start; see rule 5).
 
 **18. In `exec` mode, never leave repo-root state artifacts behind.**
 Use exec scratch path and clean up before exit.
@@ -160,16 +163,18 @@ Claude scans the repo, asks targeted questions, asks to choose foreground or bac
 
 ## Helper Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `autoresearch_init_run.py` | Initialize run — create results.tsv + state.json with baseline |
-| `autoresearch_record_iteration.py` | Record iteration — update TSV + state |
-| `autoresearch_state.py check\|summary\|pause\|resume\|complete` | State management |
+All scripts require `PYTHONPATH=${SCRIPTS}` and are called as `PYTHONPATH=${SCRIPTS} python3 ${SCRIPTS}/<script>`.
+
+| Script | CLI Usage |
+|--------|-----------|
+| `autoresearch_init_run.py` | `--repo <path> --goal "..." --metric-name "..." --direction lower\|higher --verify "..." --baseline-metric <N>` |
+| `autoresearch_record_iteration.py` | `--repo <path> --status keep\|discard\|crash\|no-op\|refine\|pivot\|search\|blocked\|drift --metric <N> [--commit <sha>] [--guard pass\|fail] [--description "..."]` |
+| `autoresearch_state.py` | `[--repo <path>] check\|summary\|pause\|resume\|complete\|stop` |
 | `autoresearch_decision.py` | Evaluate keep/discard/trial decisions |
-| `autoresearch_lessons.py append\|list` | Lessons management |
-| `autoresearch_session_start.py` | Hook: detect active runs on session start |
-| `autoresearch_stop_check.py` | Hook: warn before stopping active run |
-| `autoresearch_hooks_monitor.py` | Hook: monitor iteration progress |
+| `autoresearch_lessons.py` | `append\|list [--repo <path>] [--lesson "..."]` |
+| `autoresearch_session_start.py` | (hook only) |
+| `autoresearch_stop_check.py` | (hook only) |
+| `autoresearch_hooks_monitor.py` | (hook only) |
 
 ## References
 

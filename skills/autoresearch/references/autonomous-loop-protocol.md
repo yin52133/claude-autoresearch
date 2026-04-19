@@ -38,7 +38,7 @@ Check for a prior interrupted run per `session-resume-protocol.md`:
 
 Do not create `autoresearch-results/results.tsv` or `autoresearch-results/state.json` before the baseline metric is known. After baseline is established, initialize with:
 ```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_init_run.py --repo <repo> --goal "..." --metric-name "..." --direction lower|higher --verify "..." --baseline-metric <value>
+PYTHONPATH=${SCRIPTS} python3 ${SCRIPTS}/autoresearch_init_run.py --repo <repo> --goal "..." --metric-name "..." --direction lower|higher --verify "..." --baseline-metric <value>
 ```
 
 ### Ask-Before-Act
@@ -192,7 +192,12 @@ Always log:
 - status
 - one-line description
 
-Use `autoresearch_record_iteration.py` for authoritative updates.
+Use `autoresearch_record_iteration.py` for authoritative updates:
+```
+PYTHONPATH=${SCRIPTS} python3 ${SCRIPTS}/autoresearch_record_iteration.py \
+  --repo <repo> --status keep|discard|crash|no-op|refine|pivot|search|blocked|drift \
+  --metric <value> [--commit <sha>] [--guard pass|fail] [--description "one-line note"]
+```
 
 ## Phase 8.5: Health Check
 

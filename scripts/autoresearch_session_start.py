@@ -37,6 +37,9 @@ def main():
             imp_pct = ((baseline - current) / abs(baseline)) * 100
         imp = f"{imp_pct:.2f}%"
 
+    plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT", "")
+    scripts = f"{plugin_root}/scripts" if plugin_root else "scripts"
+
     lines = [
         "",
         "=== Autoresearch Active Run Detected ===",
@@ -49,7 +52,7 @@ def main():
         f"  Pivot count: {state.get('pivot_count', 0)}",
         "",
         "Use /autoresearch to continue the loop, or check with:",
-        "  python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_state.py summary",
+        f"  PYTHONPATH={scripts} python3 {scripts}/autoresearch_state.py summary",
         "",
     ]
 

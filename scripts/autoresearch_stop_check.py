@@ -29,11 +29,13 @@ def main():
     baseline = state.get("baseline_metric", 0)
     iterations = state.get("iteration_count", 0)
 
+    plugin_root = os.environ.get("CLAUDE_PLUGIN_ROOT", "")
+    scripts = f"{plugin_root}/scripts" if plugin_root else "scripts"
     sys.stderr.write(
         f"\n[autoresearch] Active run detected (iteration {iterations}).\n"
         f"[autoresearch] Current metric: {metric}={current} (baseline: {baseline}).\n"
-        f"[autoresearch] To stop safely: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_state.py complete\n"
-        f"[autoresearch] To pause: python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_state.py pause\n"
+        f"[autoresearch] To stop safely: PYTHONPATH={scripts} python3 {scripts}/autoresearch_state.py complete\n"
+        f"[autoresearch] To pause: PYTHONPATH={scripts} python3 {scripts}/autoresearch_state.py pause\n"
     )
     sys.exit(0)
 
