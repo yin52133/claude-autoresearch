@@ -1,96 +1,41 @@
-# Loop Mode Workflow
+# Loop Workflow
 
-Metric-driven autonomous improvement toward a measurable goal.
+Use this workflow for the default metric-driven improve/verify loop.
 
-## When to Use
+This is the thin execution guide for active runtime work. Load `autonomous-loop-protocol.md` for Phase 0 on every fresh launch, resume boundary, or recovery decision. Once the loop is running, keep `runtime-hard-invariants.md` in memory and reopen `autonomous-loop-protocol.md` only when you need detailed recovery, health-check, or escalation behavior.
 
-Use loop mode when the goal is quantifiable: test coverage percentage, error count, lint warnings, latency, custom metric.
+## Purpose
 
-## Before Starting
+Iterate toward a measurable outcome by making one focused change, verifying mechanically, deciding keep or discard, logging the result, and repeating.
 
-1. Run the interaction wizard to confirm goal, metric, and verification command
-2. Initialize the run: `autoresearch_init_run.py --goal ... --metric-name ... --direction maximize|minimize --verify "..." --baseline-metric ...`
-3. Read current state: `autoresearch_state.py summary`
-4. Confirm "go" from user
+## Before Launch
 
-## Each Iteration
+- Use `interaction-wizard.md` for every new interactive launch.
+- Use `session-resume-protocol.md` before deciding whether the run is fresh or resumable.
+- Use `environment-awareness.md` before choosing hardware-sensitive work.
 
-### Step 1: Scan
+## Runtime Cycle
 
-Read `autoresearch-results/state.json`:
-- Current metric value and direction
-- Iteration count
-- Consecutive discard count
-- Pivot count
-- Last strategy used
+1. Read the current in-scope context, recent results rows, and relevant retained state.
+2. If no baseline exists yet, measure it and initialize `autoresearch-results/results.tsv` plus `autoresearch-results/state.json`.
+3. Choose one focused hypothesis.
+4. Make one focused change within scope.
+5. Run the verify command and guard.
+6. Record the result through `autoresearch_record_iteration.py`.
+7. Only after the result is recorded, choose the next experiment.
 
-### Step 2: Plan
+## Escalation And Recovery
 
-Based on the metric and current state, plan one focused change:
+- Use `pivot-protocol.md` when repeated discards show the current line of attack is stale.
+- Use `results-logging.md` only when you need the detailed TSV/state contract or helper behavior.
+- Use `lessons-protocol.md` only when you need to reason about lessons behavior directly.
+- Use `health-check-protocol.md` when runtime integrity looks suspect.
+- Use `parallel-experiments-protocol.md`, `web-search-protocol.md`, or `hypothesis-perspectives.md` only when those behaviors are actively in play.
 
-- What specific aspect of the code needs to change?
-- What is the expected direction of improvement?
-- Is this a refinement or a pivot? (check escalation)
+## Stop Conditions
 
-### Step 3: Modify
-
-Make one focused change using Edit or Write tools. Choose the file(s) most likely to move the metric.
-
-### Step 4: Commit
-
-```bash
-git add <changed files>
-git commit -m "Autoresearch iteration N: <brief description>"
-```
-
-Capture the commit SHA for recording.
-
-### Step 5: Verify
-
-Run the verification command. Capture the metric value from stdout.
-
-**If the guard command exists and fails:** Revert immediately and record as crash.
-
-### Step 6: Decide
-
-Compare new metric vs baseline:
-
-- **Keep**: improvement ≥ 1% AND guard passed
-- **Discard**: improvement < 1% OR guard failed
-
-**If keep:** Commit stands.
-**If discard:** `git revert HEAD` to undo the change.
-
-### Step 7: Log
-
-Record the iteration:
-```
-python3 ${CLAUDE_PLUGIN_ROOT}/scripts/autoresearch_record_iteration.py \
-  --status keep|discard|crash \
-  --metric <value> \
-  --commit <sha> \
-  --guard true|false \
-  --description "<brief description>"
-```
-
-The script returns JSON with escalation signal if applicable.
-
-### Step 8: Escalate
-
-Check the escalation signal from the recording script:
-- **refine**: 3+ consecutive discards — adjust within current strategy
-- **pivot**: 5+ consecutive non-keeps — try fundamentally different approach
-- **stop**: 3 pivots without improvement — report to human
-
-If escalation triggers, follow `references/pivot-protocol.md`.
-
-### Step 9: Repeat
-
-Continue to next iteration. Every ~10 iterations, use `/compact` and re-read SKILL.md and state.json.
-
-## Termination Conditions
-
-- Goal metric reached
-- 3 pivots without improvement
-- User interrupts
-- Context limit approaching (use `/compact`)
+Keep iterating until one of these happens:
+- the goal is reached
+- the user interrupts
+- the configured iteration cap is reached
+- a true blocker appears

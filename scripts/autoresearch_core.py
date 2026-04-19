@@ -13,36 +13,35 @@ STATE_FILE_NAME = "state.json"
 LESSONS_FILE_NAME = "lessons.md"
 CONTEXT_FILE_NAME = "context.json"
 
-TSV_HEADER_COMMENT = (
-    "# claude-autoresearch iteration log\n"
-    "# Each row records one experiment iteration\n"
-)
 TSV_COLUMNS = [
     "iteration",
-    "timestamp",
+    "commit",
+    "metric",
+    "delta",
+    "guard",
     "status",
-    "metric_value",
-    "improvement_pct",
-    "commit_sha",
-    "guard_passed",
     "description",
 ]
-TSV_HEADER = "\t".join(TSV_COLUMNS)
 
+STATUS_BASELINE = "baseline"
 STATUS_KEEP = "keep"
 STATUS_DISCARD = "discard"
 STATUS_CRASH = "crash"
 STATUS_NOOP = "no-op"
 STATUS_REFINE = "refine"
 STATUS_PIVOT = "pivot"
-STATUS_BASELINE = "baseline"
+STATUS_SEARCH = "search"
+STATUS_BLOCKED = "blocked"
+STATUS_DRIFT = "drift"
 
 KEEP_STATUSES = {STATUS_KEEP, STATUS_BASELINE}
+NON_KEEP_STATUSES = {STATUS_DISCARD, STATUS_CRASH, STATUS_NOOP, STATUS_REFINE}
 
 REFINE_THRESHOLD = 3
 PIVOT_THRESHOLD = 5
 STOP_PIVOT_COUNT = 3
 MIN_IMPROVEMENT_PCT = 1.0
+COMPACTION_INTERVAL = 10
 
 
 def artifact_dir(repo_root: Optional[str] = None) -> Path:
@@ -66,13 +65,32 @@ def context_path(repo_root: Optional[str] = None) -> Path:
     return artifact_dir(repo_root) / CONTEXT_FILE_NAME
 
 
-def improvement(baseline: float, current: float, direction: str) -> float:
+def improvement(current: float, baseline: float, direction: str) -> bool:
+    """Return True if current is an improvement over baseline per direction."""
+    if direction == "higher":
+        return current > baseline
+    elif direction == "lower":
+        return current < baseline
+    else:
+        raise ValueError(f"direction must be 'lower' or 'higher', got: {direction}")
+
+
+def delta_value(current: float, previous: float) -> float:
+    """Return delta (current - previous)."""
+    return current - previous
+
+
+def improvement_pct(baseline: float, current: float) -> float:
     if baseline == 0:
         return 0.0 if current == 0 else 100.0
-    if direction == "maximize":
-        return ((current - baseline) / abs(baseline)) * 100
-    else:
-        return ((baseline - current) / abs(baseline)) * 100
+    return ((current - baseline) / abs(baseline)) * 100
+
+
+def fmt_delta(delta: float) -> str:
+    text = f"{delta:.4f}".rstrip("0").rstrip(".")
+    if delta > 0 and not text.startswith("+"):
+        return f"+{text}"
+    return text
 
 
 def fmt_metric(value: float) -> str:
@@ -83,6 +101,10 @@ def fmt_metric(value: float) -> str:
 
 def iso_now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime())
+
+
+def utc_now() -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%S+0000", time.gmtime())
 
 
 def load_state(repo_root: Optional[str] = None) -> Optional[dict]:

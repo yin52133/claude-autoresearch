@@ -1,97 +1,98 @@
-# Pivot Protocol — Escalation Ladder
+# PIVOT / REFINE Decision Framework
 
-What to do when the autonomous loop stalls.
+Smart stuck recovery with a graduated escalation system.
 
-## The Problem
+## Definitions
 
-The loop will sometimes hit a plateau where the current strategy stops producing improvements. This is expected — not every approach works. The escalation ladder provides a structured response.
+- **REFINE:** Adjust within the current strategy. Change parameters, scope, or approach details without abandoning the overall direction.
+- **PIVOT:** Abandon the current strategy entirely. Try a fundamentally different approach to the same goal.
 
-## Escalation Levels
+## Escalation Ladder
 
-### Level 1: Continue (default)
+### Level 1: REFINE (3 consecutive discards)
 
-Current strategy is working. No intervention needed.
+Trigger: 3 consecutive iterations with status `discard`, `crash`, or `no-op`.
 
-- Metric is improving → keep iterating
-- Consecutive discards < 3 → stay the course
+Actions:
+1. Re-read the last 10 results log entries.
+2. Identify what is common across failed attempts.
+3. Consult `autoresearch-results/lessons.md` for insights.
+4. Generate a hypothesis that differs in at least one concrete dimension:
+   - Different file within scope
+   - Different technique
+   - Different granularity
+5. Log the decision as status `refine` in the results TSV.
 
-### Level 2: Refine (3 consecutive discards)
+### Level 2: PIVOT (5 consecutive non-keeps)
 
-Adjust within the current strategy.
+Trigger: 5 consecutive non-keep iterations since the last keep (refines count toward this).
 
-**Trigger:** 3 consecutive discard iterations.
+Actions:
+1. Re-read all in-scope files from scratch.
+2. Re-read the original goal.
+3. Review the entire results log for patterns.
+4. Explicitly name the strategy being abandoned and why.
+5. Choose a fundamentally different approach:
+   - If previous attempts were incremental, try a structural change.
+   - If previous attempts targeted one file, try a cross-file approach.
+   - If previous attempts added code, try removing or simplifying.
+   - If previous attempts were conservative, try a bolder change.
+6. Consult lessons for successful strategies in different contexts.
+7. Log the decision as status `pivot` in the results TSV.
 
-**What to do:**
-1. Analyze what has been tried so far (read lessons.md)
-2. Identify patterns that didn't work
-3. Narrow the focus or try a more targeted approach
-4. Explicitly log the refinement decision
+### Level 3: Web Search (2 PIVOTs without improvement)
 
-**Examples:**
-- "Too broad — targeting specific files instead of whole codebase"
-- "Pattern not matching — trying regex approach instead"
-- "Too aggressive — smaller incremental changes"
+Trigger: 2 PIVOT decisions have been made since the last keep, with no improvement.
 
-### Level 3: Pivot (5 consecutive non-keeps)
+Actions:
+1. Formulate a targeted search query based on the current blocker.
+2. Follow `references/web-search-protocol.md` for search execution.
+3. Treat search results as hypotheses — still verify mechanically.
+4. Log as status `search` in the results TSV.
 
-Fundamentally change strategy.
+### Level 4: Soft Blocker (3 PIVOTs without improvement)
 
-**Trigger:** 5 consecutive non-keep iterations (discard + refine + crash).
+Trigger: 3 PIVOT decisions without any keep since the first pivot.
 
-**What to do:**
-1. Acknowledge the current approach has failed
-2. Read lessons.md for patterns across all attempts
-3. Propose a fundamentally different approach
-4. Explicitly log the pivot with a clear rationale
-5. Reset consecutive discard counter to 0
+Actions:
+1. Print a warning:
+   ```
+   [WARNING] 3 strategy pivots without improvement. The goal may require
+   manual intervention, broader scope, or a different metric.
+   Stopping and reporting a soft blocker.
+   ```
+2. Stop the current run.
+3. Report that the next step likely needs human input.
 
-**Examples:**
-- "Adding tests from scratch didn't work — try test-driven refactoring instead"
-- "Inline changes too risky — try extraction and replacement"
-- "Type annotations causing issues — try strict mode off approach"
+## Counting Rules
 
-### Level 4: Web Search (2 pivots without improvement)
+| Status | Counts toward REFINE (3)? | Counts toward PIVOT (5)? | Resets counters? |
+|--------|--------------------------|--------------------------|-----------------|
+| `keep` | no | no | **yes — resets all** |
+| `discard` | yes | yes | no |
+| `crash` | yes | yes | no |
+| `no-op` | yes | yes | no |
+| `refine` | no (it IS the refine) | yes (counts as non-keep) | no |
+| `pivot` | no (it IS the pivot) | no (it IS the pivot) | no |
+| `search` | no (action, not outcome) | no | no |
+| `drift` | no (environmental) | no | no |
+| `baseline` | no | no | no |
+| `blocked` | hard stop | hard stop | n/a |
 
-Look for external solutions.
+## Integration with Lessons
 
-**Trigger:** 2 pivot cycles with no improvement recorded.
+After every PIVOT:
+- Extract a lesson per `references/lessons-protocol.md`.
+- Record which strategy family was abandoned and the iteration cost.
 
-**What to do:**
-1. Use web search to find solutions others have used for similar goals
-2. Adapt known patterns to this codebase
-3. Log the web search results
+## Example
 
-### Level 5: Stop (3 pivots without improvement)
-
-Report to human.
-
-**Trigger:** 3 pivot cycles with no improvement.
-
-**What to do:**
-1. Stop the autonomous loop
-2. Generate a summary report:
-   - Original goal
-   - Total iterations attempted
-   - Strategies tried (refine + pivot cycles)
-   - Best metric achieved
-   - Remaining gap
-   - Suggested next steps for human
-3. Save final state with `autoresearch_state.py complete`
-4. Present the report to the user
-
-## Pivot Count Tracking
-
-The `state.json` tracks `pivot_count` and `consecutive_discards`:
-- `consecutive_discards` resets on keep
-- `pivot_count` increments on pivot and does not reset
-- Stop is triggered when `pivot_count >= 3` and no net improvement
-
-## Logging
-
-Every escalation decision should be logged to `lessons.md`:
 ```
-## Iteration N — ESCALATION: refine|pivot|stop
-Reason: <why this escalation was triggered>
-Decision: <what will change>
-Previous approaches: <summary of what was tried>
+iteration	commit	metric	delta	guard	status	description
+0	a1b2c3d	47	0	-	baseline	initial any count
+1	b2c3d4e	41	-6	pass	keep	type-narrow auth module
+2	c3d4e5f	43	+2	-	discard	generic wrapper attempt
+3	d4e5f6a	45	+4	-	discard	broader type union
+4	-	41	0	-	refine	[REFINE] shifting from auth to api layer
+5	c3d4e5f	38	-3	pass	keep	narrow api response handlers
 ```
