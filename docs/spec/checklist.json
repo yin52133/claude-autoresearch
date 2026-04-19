@@ -5,7 +5,7 @@
     {
       "id": "phase-0",
       "name": "Design Spec",
-      "status": "in_progress",
+      "status": "done",
       "items": [
         { "id": "0.1", "task": "docs/spec/design-spec.md", "status": "done" },
         { "id": "0.2", "task": "docs/spec/checklist.json", "status": "done" },
@@ -16,64 +16,64 @@
     {
       "id": "phase-1",
       "name": "Core Infrastructure",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "1.1", "task": "scripts/autoresearch_core.py", "status": "pending" },
-        { "id": "1.2", "task": "scripts/autoresearch_init_run.py", "status": "pending" },
-        { "id": "1.3", "task": "scripts/autoresearch_record_iteration.py", "status": "pending" },
-        { "id": "1.4", "task": "scripts/autoresearch_state.py", "status": "pending" }
+        { "id": "1.1", "task": "scripts/autoresearch_core.py", "status": "done" },
+        { "id": "1.2", "task": "scripts/autoresearch_init_run.py", "status": "done" },
+        { "id": "1.3", "task": "scripts/autoresearch_record_iteration.py", "status": "done" },
+        { "id": "1.4", "task": "scripts/autoresearch_state.py", "status": "done" }
       ]
     },
     {
       "id": "phase-2",
       "name": "Skill Protocol",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "2.1", "task": "skills/autoresearch/SKILL.md", "status": "pending" },
-        { "id": "2.2", "task": "skills/autoresearch/references/loop-workflow.md", "status": "pending" },
-        { "id": "2.3", "task": "skills/autoresearch/references/interaction-wizard.md", "status": "pending" },
-        { "id": "2.4", "task": "skills/autoresearch/references/pivot-protocol.md", "status": "pending" }
+        { "id": "2.1", "task": "skills/autoresearch/SKILL.md", "status": "done" },
+        { "id": "2.2", "task": "skills/autoresearch/references/loop-workflow.md", "status": "done" },
+        { "id": "2.3", "task": "skills/autoresearch/references/interaction-wizard.md", "status": "done" },
+        { "id": "2.4", "task": "skills/autoresearch/references/pivot-protocol.md", "status": "done" }
       ]
     },
     {
       "id": "phase-3",
       "name": "Plugin + Hooks",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "3.1", "task": ".claude-plugin/plugin.json", "status": "pending" },
-        { "id": "3.2", "task": "commands/autoresearch.md", "status": "pending" },
-        { "id": "3.3", "task": "hooks/hooks.json", "status": "pending" },
-        { "id": "3.4", "task": "scripts/autoresearch_session_start.py", "status": "pending" },
-        { "id": "3.5", "task": "scripts/autoresearch_stop_check.py", "status": "pending" }
+        { "id": "3.1", "task": ".claude-plugin/plugin.json", "status": "done" },
+        { "id": "3.2", "task": "commands/autoresearch.md", "status": "done" },
+        { "id": "3.3", "task": "hooks/hooks.json", "status": "done" },
+        { "id": "3.4", "task": "scripts/autoresearch_session_start.py", "status": "done" },
+        { "id": "3.5", "task": "scripts/autoresearch_stop_check.py", "status": "done" }
       ]
     },
     {
       "id": "phase-4",
       "name": "Additional Modes + Polish",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "4.1", "task": "skills/autoresearch/references/debug-workflow.md", "status": "pending" },
-        { "id": "4.2", "task": "skills/autoresearch/references/fix-workflow.md", "status": "pending" },
-        { "id": "4.3", "task": "skills/autoresearch/references/runtime-invariants.md", "status": "pending" },
-        { "id": "4.4", "task": "scripts/autoresearch_hooks_monitor.py", "status": "pending" }
+        { "id": "4.1", "task": "skills/autoresearch/references/debug-workflow.md", "status": "done" },
+        { "id": "4.2", "task": "skills/autoresearch/references/fix-workflow.md", "status": "done" },
+        { "id": "4.3", "task": "skills/autoresearch/references/runtime-invariants.md", "status": "done" },
+        { "id": "4.4", "task": "scripts/autoresearch_hooks_monitor.py", "status": "done" }
       ]
     },
     {
       "id": "phase-5",
       "name": "Verification",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "5.1", "task": "End-to-end plugin test", "status": "pending" }
+        { "id": "5.1", "task": "End-to-end plugin test", "status": "done" }
       ]
     },
     {
       "id": "phase-6",
       "name": "README + Push",
-      "status": "pending",
+      "status": "done",
       "items": [
-        { "id": "6.1", "task": "README.md (English)", "status": "pending" },
-        { "id": "6.2", "task": "README_CN.md (Chinese)", "status": "pending" },
-        { "id": "6.3", "task": "Commit and push", "status": "pending" }
+        { "id": "6.1", "task": "README.md (English)", "status": "done" },
+        { "id": "6.2", "task": "README_CN.md (Chinese)", "status": "done" },
+        { "id": "6.3", "task": "Commit and push", "status": "done" }
       ]
     }
   ]
