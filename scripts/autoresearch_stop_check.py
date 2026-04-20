@@ -6,16 +6,30 @@ import os
 import sys
 from pathlib import Path
 
-ARTIFACT_DIR = Path(os.environ.get("PWD", ".")) / "autoresearch-results"
-STATE_PATH = ARTIFACT_DIR / "state.json"
+
+def _resolve_cwd_from_stdin() -> str | None:
+    raw = sys.stdin.read().strip()
+    if raw:
+        try:
+            payload = json.loads(raw)
+            cwd = payload.get("cwd")
+            if isinstance(cwd, str) and cwd:
+                return cwd
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return None
 
 
 def main():
-    if not STATE_PATH.exists():
+    cwd = _resolve_cwd_from_stdin() or os.environ.get("PWD", ".")
+    artifact_dir = Path(cwd) / "autoresearch-results"
+    state_path = artifact_dir / "state.json"
+
+    if not state_path.exists():
         sys.exit(0)
 
     try:
-        with open(STATE_PATH) as f:
+        with open(state_path) as f:
             state = json.load(f)
     except (json.JSONDecodeError, IOError):
         sys.exit(0)

@@ -7,17 +7,30 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-ARTIFACT_DIR = Path(os.environ.get("PWD", ".")) / "autoresearch-results"
-STATE_PATH = ARTIFACT_DIR / "state.json"
-CONTEXT_PATH = ARTIFACT_DIR / "context.json"
+
+def _resolve_artifact_dir() -> Path:
+    raw = sys.stdin.read().strip()
+    if raw:
+        try:
+            payload = json.loads(raw)
+            cwd = payload.get("cwd")
+            if isinstance(cwd, str) and cwd:
+                return Path(cwd) / "autoresearch-results"
+        except (json.JSONDecodeError, TypeError):
+            pass
+    return Path(os.environ.get("PWD", ".")) / "autoresearch-results"
 
 
 def main():
-    if not STATE_PATH.exists():
+    artifact_dir = _resolve_artifact_dir()
+    state_path = artifact_dir / "state.json"
+    context_path = artifact_dir / "context.json"
+
+    if not state_path.exists():
         sys.exit(0)
 
     try:
-        with open(STATE_PATH) as f:
+        with open(state_path) as f:
             state = json.load(f)
     except (json.JSONDecodeError, IOError):
         sys.exit(0)
@@ -26,7 +39,7 @@ def main():
         sys.exit(0)
 
     try:
-        with open(CONTEXT_PATH) as f:
+        with open(context_path) as f:
             context = json.load(f)
     except (json.JSONDecodeError, IOError):
         context = {}
@@ -34,11 +47,11 @@ def main():
     context["last_activity"] = datetime.now().isoformat()
     context["iteration_count"] = state.get("iteration_count", 0)
 
-    tmp = CONTEXT_PATH.with_suffix(".tmp")
+    tmp = context_path.with_suffix(".tmp")
     with open(tmp, "w") as f:
         json.dump(context, f, indent=2)
         f.write("\n")
-    tmp.rename(CONTEXT_PATH)
+    tmp.rename(context_path)
 
     sys.exit(0)
 
