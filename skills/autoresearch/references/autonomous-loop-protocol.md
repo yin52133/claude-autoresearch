@@ -222,9 +222,17 @@ Compaction counter:
 
 ## Phase 9: Repeat
 
+**This is a hard loop. After logging, you MUST return to Phase 1 immediately.**
+
 For bounded runs: stop after `Iterations` completes or earlier if goal is achieved.
 
-For unbounded runs: NEVER ask "should I continue?" after launch. Continue until goal reached, user interrupts, iteration cap reached, true blocker appears, or soft-blocker handoff.
+For unbounded runs:
+- NEVER ask "should I continue?" after launch. The user may be asleep.
+- NEVER pause to ask any question during the loop. If something is unclear, apply best practices and keep going.
+- NEVER stop to summarize progress between iterations. The results log IS the summary.
+- Continue until goal reached, user interrupts, iteration cap reached, true blocker appears, or soft-blocker handoff.
+- If you run out of obvious ideas, revisit the results log for patterns, try combinations, or attempt bolder changes. Pausing to ask is not an option.
+- **After this phase completes, return to Phase 1 (Read) NOW. Do not output any text between Phase 9 and the next Phase 1.**
 
 ### PIVOT / REFINE Stuck Recovery
 

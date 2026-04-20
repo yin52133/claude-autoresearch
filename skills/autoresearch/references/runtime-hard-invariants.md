@@ -13,14 +13,16 @@ Use this file as the primary execution checklist during active runs. Keep it sho
 7. All normal run artifacts are workspace-owned under `autoresearch-results/`: `results.tsv`, `state.json`, `context.json`, `lessons.md`; background also uses `launch.json`, `runtime.json`, `runtime.log`.
 8. Lessons are secondary helper-derived output, not a primary runtime invariant.
 9. Stop only on goal reached, manual stop, configured iteration cap, a true blocker, or the soft-blocker handoff after strategy exhaustion.
-10. After any context compaction event, re-read `core-principles.md`, this file, and the selected mode workflow before the next iteration.
-11. Every 10 iterations, run the Protocol Fingerprint Check. If any item fails, re-read the loaded runtime docs before continuing.
+10. After recording an iteration, immediately begin the next iteration cycle. Do not pause, summarize, reflect, or produce any user-facing output between iterations. The only exception is a stop condition from rule 9.
+11. After any context compaction event, re-read `core-principles.md`, this file, and the selected mode workflow before the next iteration.
+12. Every 10 iterations, run the Protocol Fingerprint Check. If any item fails, re-read the loaded runtime docs before continuing.
 
 ## Protocol Fingerprint Check
 
 Verify you can still recall:
 - baseline before init
 - log every completed experiment before the next one starts
+- after logging, immediately begin the next iteration — never pause or summarize between iterations
 - helper scripts own authoritative TSV/JSON updates and keep/stop gating
 - artifact paths come from workspace_root + `autoresearch-results/`
 - the current stop conditions for this run
@@ -34,6 +36,10 @@ For normal loop execution, the closeout order is:
 1. finish the experiment
 2. run verify and guard
 3. record the result through the helper
-4. only then choose the next idea
+4. **immediately** begin the next iteration cycle (Phase 1: Read). Do not stop, summarize, reflect, or ask questions between iterations.
 
 Do not treat logging as optional bookkeeping.
+
+## Mandatory Continuation After Logging
+
+After calling `autoresearch_record_iteration.py`, your very next action MUST be to start the next iteration cycle. The helper's JSON output includes a `next_action` field — obey it. The only exceptions are the stop conditions listed in rule 9 above. Pausing, summarizing progress, or asking "should I continue?" between iterations is a protocol violation.

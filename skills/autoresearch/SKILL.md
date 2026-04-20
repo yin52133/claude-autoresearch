@@ -122,7 +122,7 @@ The iteration cap, if set, is a terminal condition.
 **13. External ship actions (deploy, publish, release) must be confirmed during the pre-launch wizard phase.**
 
 **14. Do not ask "should I continue?" during the loop.**
-Keep the chosen run mode active until interrupted or a hard blocker appears.
+Do not pause between iterations. Once launched, after each iteration is logged, immediately begin the next iteration cycle. The helper output includes `"next_action": "BEGIN_NEXT_ITERATION"` — treat it as a mandatory directive. Keep the chosen run mode active until interrupted or a hard blocker appears.
 
 **15. During active execution, keep `references/runtime-hard-invariants.md` as the primary runtime checklist.**
 Foreground persistent artifacts: `results.tsv`, `state.json`, `context.json`, `lessons.md`. Background also uses `launch.json`, `runtime.json`, `runtime.log`.

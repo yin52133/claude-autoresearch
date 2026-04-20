@@ -132,6 +132,8 @@ def main():
         "pivot_count": pc,
         "best_metric": st.get("best_metric"),
         "best_iteration": st.get("best_iteration"),
+        "next_action": "BEGIN_NEXT_ITERATION",
+        "continuation_signal": "Iteration logged. Immediately begin the next iteration cycle (Phase 1: Read). Do NOT stop, summarize, or ask questions.",
     }
     if escalation:
         output["escalation"] = escalation

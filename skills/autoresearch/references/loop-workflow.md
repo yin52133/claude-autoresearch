@@ -16,13 +16,15 @@ Iterate toward a measurable outcome by making one focused change, verifying mech
 
 ## Runtime Cycle
 
+**This is a continuous loop. After step 7, return to step 1 immediately.**
+
 1. Read the current in-scope context, recent results rows, and relevant retained state.
 2. If no baseline exists yet, measure it and initialize `autoresearch-results/results.tsv` plus `autoresearch-results/state.json`.
 3. Choose one focused hypothesis.
 4. Make one focused change within scope.
 5. Run the verify command and guard.
 6. Record the result through `autoresearch_record_iteration.py`.
-7. Only after the result is recorded, choose the next experiment.
+7. Only after the result is recorded, **immediately return to step 1**. Do not stop, summarize, or ask questions between iterations. The helper output includes `"next_action": "BEGIN_NEXT_ITERATION"` — obey it.
 
 ## Escalation And Recovery
 
